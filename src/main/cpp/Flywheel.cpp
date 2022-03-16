@@ -1,10 +1,27 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 #include "Flywheel.h"
 
-Flywheel::Flywheel() : rev::CANSparkMax(WiringDiagram::c_Flywheel, rev::CANSparkMax::MotorType::kBrushless)
+// Uses the default constructor for the Flywheel object, in other words, we don't need to run any special code or take any inputs.
+Flywheel::Flywheel() = default;
+
+void Flywheel::SetReference(double setpoint)
 {
-    
+    m_PID.SetReference(setpoint, rev::CANSparkMax::ControlType::kVelocity, 0);
+    m_PIDValues.setpoint = setpoint;
+}
+
+void Flywheel::StopMotor()
+{
+    m_Flywheel.StopMotor();
+}
+
+bool Flywheel::InVelocityRange()
+{
+    if(m_Encoder.GetVelocity() < m_PIDValues.setpoint + m_PIDValues.velocityTolerance && m_Encoder.GetVelocity() > m_PIDValues.setpoint - m_PIDValues.velocityTolerance)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

@@ -1,42 +1,36 @@
 #include "FrcPID.h"
 
-/**
- * Constructs an FrcPID
- * 
- * @param inputValues Easy input for the many PID tuning values. */
-FrcPID::FrcPID(PIDValues inputValues) : PIDController()
+FrcPID::FrcPID(PIDValues inputValues) : PIDController(m_PIDValues.kP, m_PIDValues.kI, m_PIDValues.kD)
 {
     m_PIDValues = inputValues;
 
     SetPID(m_PIDValues.kP, m_PIDValues.kI, m_PIDValues.kD);
-    SetSetpoint(myPIDValues.setpoint);
+    SetSetpoint(m_PIDValues.setpoint);
     SetTolerance(m_PIDValues.positionTolerance, m_PIDValues.velocityTolerance);
 }
 
-/**
- * Returns the next output of the controller clamped from MinOutput to MaxOutput
- * 
- * @param input The process variable */
 double FrcPID::ClampCalculate(double input)
 {
+    // Runs the inherited Calculate method from the frc2/command/PIDController file then stores it in output.
     double output = Calculate(input);
-    if(output > myPIDValues.kMaxOutput) { output = myPIDValues.kMaxOutput; }
-    if(output < myPIDValues.kMinOutput) { output = myPIDValues.kMinOutput; }
+
+    // Clamps output to the range between the MinOutput and MaxOutput.
+    if(output > m_PIDValues.kMaxOutput) { output = m_PIDValues.kMaxOutput; }
+    if(output < m_PIDValues.kMinOutput) { output = m_PIDValues.kMinOutput; }
 
     return output;
 }
 
-/**
- * Sets the setpoint, then returns the next output of the controller clamped from MinOutput to MaxOutput
- * 
- * @param input The process variable
- * @param setpoint The new Setpoint */
+// Overloads the fucntion above. In other words, the function above runs if there is only one input, the function below runs if there are two inputs.
 double FrcPID::ClampCalculate(double input, double setpoint)
 {
-    myPIDValues.setpoint = inputSetpoint;
+    // Runs the inherited Calculate method from the frc2/command/PIDController file then stores it in output.
+    m_PIDValues.setpoint = setpoint;
 
-    double output = Calculate(input, myPIDValues.setpoint);
-    if(output > myPIDValues.kMaxOutput) { output = myPIDValues.kMaxOutput; }
-    if(output < myPIDValues.kMinOutput) { output = myPIDValues.kMinOutput; }
+    // Clamps output to the range between the MinOutput and MaxOutput.
+    double output = Calculate(input, m_PIDValues.setpoint);
+    if(output > m_PIDValues.kMaxOutput) { output = m_PIDValues.kMaxOutput; }
+    if(output < m_PIDValues.kMinOutput) { output = m_PIDValues.kMinOutput; }
+
     return output;
 }
