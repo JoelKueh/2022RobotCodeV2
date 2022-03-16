@@ -4,6 +4,14 @@
 
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <frc/XboxController.h>
+
+#include "Drive.h"
+#include "Turret.h"
+#include "Hanger.h"
+#include "Intake.h"
+#include "Limelight.h"
+#include "WiringDiagram.h"
 
 class Robot : public frc::TimedRobot {
  public:
@@ -25,4 +33,28 @@ class Robot : public frc::TimedRobot {
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
   std::string m_autoSelected;
+
+  units::time::second_t lastShotTime;
+
+  double overriddenRPM = 2500;
+  double overriddenElevator = 10;
+
+  bool resetDone = false;
+  bool aimOverridden = false;
+
+  bool intakeOut = true;
+  bool hangerOut = false;
+
+  bool targeting = false;
+  bool lockedOn = false;
+
+  frc::XboxController* m_Xbox;
+  Drive* m_Drive;
+  Turret* m_Turret;
+  Hanger* m_Hanger;
+  Intake* m_Intake;
+  Limelight* m_Limelight;
+
+  void AimOverriddenControl();
+  void AimedControl();
 };
