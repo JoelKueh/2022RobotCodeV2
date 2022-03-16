@@ -20,11 +20,11 @@ class WiringDiagram {
 
   static const int c_IntakeMotor = 0; // CAN
   static const int c_PCMID = 0; // CAN
-  static const int c_IntakePistonIn = 4; // CAN
-  static const int c_IntakePistonOut = 5; // CAN
+  static const int c_IntakePistonA = 5; // CAN
+  static const int c_IntakePistonB = 4; // CAN
 
-  static const int c_HangerPistonIn = 6; // CAN
-  static const int c_HangarPistonOut = 7; // CAN
+  static const int c_HangerPistonA = 6; // CAN
+  static const int c_HangarPistonB = 7; // CAN
 
   static const int c_Xbox = 0; // Xbox
 };
