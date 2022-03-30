@@ -1,7 +1,11 @@
 #include "Intake.h"
 
 // Uses the default constructor for Intake.
-Intake::Intake() = default;
+Intake::Intake()
+{
+    IntakeMotor.SetInverted(true);
+    IntakeMotor.SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
+}
 
 void Intake::In()
 {
@@ -23,10 +27,11 @@ void Intake::Toggle()
 
 bool Intake::Init(units::time::second_t startTime, units::time::second_t elapsedTime)
 {
-    if(elapsedTime - startTime < 1_s)
+    if(elapsedTime - startTime < .25_s)
     {
         IntakeMotor.Set(1);
         Out();
+        return false;
     }
     else
     {
@@ -37,12 +42,12 @@ bool Intake::Init(units::time::second_t startTime, units::time::second_t elapsed
 
 void Intake::SpinForward()
 {
-    IntakeMotor.Set(.9);
+    IntakeMotor.Set(1);
 }
 
 void Intake::SpinReverse()
 {
-    IntakeMotor.Set(-.9);
+    IntakeMotor.Set(-1);
 }
 
 void Intake::Stop()
