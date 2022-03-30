@@ -1,0 +1,131 @@
+<xml version="1.0">
+<dashboard>
+	<widget field="Gyro" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="180"/>
+	</widget>
+	<widget field="Auto State" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="160"/>
+	</widget>
+	<widget field="In Elevator Range" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="343"/>
+	</widget>
+	<widget field="In Drive Range" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="140"/>
+	</widget>
+	<widget field="In Flywheel Range" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="120"/>
+	</widget>
+	<widget field="Aiming State" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="80"/>
+	</widget>
+	<widget field="Drive kD" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="663" y="55"/>
+	</widget>
+	<widget field="Drive kI" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="667" y="34"/>
+	</widget>
+	<widget field="Drive kP" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="665" y="13"/>
+	</widget>
+	<widget field="Flywheel Setpoint" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="286" y="74"/>
+	</widget>
+	<widget field="RPM" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="348" y="95"/>
+		<width>104</width>
+	</widget>
+	<widget field="Limelight Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="60"/>
+	</widget>
+	<widget field="Limelight X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="40"/>
+	</widget>
+	<widget field="Target Found?" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="323"/>
+	</widget>
+	<widget field="Locked On" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="303"/>
+	</widget>
+	<widget field="Targeting?" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="283"/>
+	</widget>
+	<widget field="Aim Overridden" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="263"/>
+	</widget>
+	<widget field="Hanger Out?" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="243"/>
+	</widget>
+	<widget field="Intake Out?" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="223"/>
+	</widget>
+	<widget field="Auto Modes" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="305" y="187"/>
+	</widget>
+	<widget field="Flywheel P Value" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="476" y="13"/>
+	</widget>
+	<widget field="Flywheel D Value" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="476" y="57"/>
+	</widget>
+	<widget field="limelight_Stream" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="100"/>
+	</widget>
+	<widget field="Flywheel I Value" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="478" y="35"/>
+	</widget>
+	<widget field="Testing Elevator Setpoint" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="250" y="30"/>
+	</widget>
+	<widget field="Testing RPM" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="307" y="9"/>
+	</widget>
+	<widget field="limelight_Interface" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="20"/>
+	</widget>
+	<widget field="limelight_PipelineName" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="0"/>
+	</widget>
+</dashboard>
+<live-window>
+	<widget field="Ungrouped" type="LW Subsystem" class="edu.wpi.first.smartdashboard.livewindow.elements.LWSubsystem">
+		<widget field="DigitalInput[0]" type="Digital Input" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
+			<location x="6" y="15"/>
+			<height>19</height>
+			<width>250</width>
+		</widget>
+		<widget field="ADXRS450_Gyro[0]" type="Gyro" class="edu.wpi.first.smartdashboard.gui.elements.Compass">
+			<location x="6" y="34"/>
+			<height>150</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,6]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="184"/>
+			<height>19</height>
+			<width>250</width>
+		</widget>
+		<widget field="Encoder[0]" type="Quadrature Encoder" class="edu.wpi.first.smartdashboard.livewindow.elements.EncoderDisplay">
+			<location x="6" y="203"/>
+			<height>92</height>
+			<width>250</width>
+		</widget>
+		<widget field="DoubleSolenoid[0,5]" type="Double Solenoid" class="edu.wpi.first.smartdashboard.livewindow.elements.RelayController">
+			<location x="6" y="295"/>
+			<height>19</height>
+			<width>250</width>
+		</widget>
+		<widget field="DigitalInput[2]" type="Digital Input" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
+			<location x="6" y="314"/>
+			<height>19</height>
+			<width>250</width>
+		</widget>
+		<widget field="DigitalInput[1]" type="Digital Input" class="edu.wpi.first.smartdashboard.livewindow.elements.DigitalInputDisplay">
+			<location x="6" y="333"/>
+			<height>19</height>
+			<width>250</width>
+		</widget>
+		<location x="0" y="0"/>
+		<width>262</width>
+		<height>358</height>
+	</widget>
+</live-window>
+</xml>
