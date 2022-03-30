@@ -1,5 +1,7 @@
 #include "Drive.h"
 
+// TODO: LOOK AT REMOVING THE MIN AND MAX OUTPUTS FROM THIS FILE
+
 Drive::Drive()
 {
     // Sets the three moters that we need to be inverted (not all of them do)
@@ -7,8 +9,21 @@ Drive::Drive()
     m_frontRight.SetInverted(true);
     m_backLeft.SetInverted(true);
 
+    m_DrivePID.EnableContinuousInput(0, 360);
+
     // The memory allocation thing referecned in line 49 of Drive.h
     m_MecanumDrive = new frc::MecanumDrive(m_frontLeft, m_backLeft, m_frontRight, m_backRight);
+}
+
+void Drive::UpdateMecanumDrive()
+{
+    m_MecanumDrive->DriveCartesian(currentDrivePower, currentStrafePower, currentTurnPower);
+}
+
+void Drive::SetMinAndMaxPower(double min, double max)
+{
+    minPower = min;
+    maxPower = max;
 }
 
 void Drive::MecanumDrive(double drivePower, double strafePower, double turnPower)
@@ -18,8 +33,9 @@ void Drive::MecanumDrive(double drivePower, double strafePower, double turnPower
     if(strafePower < .15 && strafePower > -.15) { strafePower = 0; }
     if(turnPower < .15 && turnPower > -.15) { turnPower = 0; }
 
-    // Runs the DriveTrain with the adjusted inputs.
-    m_MecanumDrive->DriveCartesian(drivePower, strafePower, turnPower);
+    currentDrivePower = std::clamp(drivePower, minPower, maxPower);
+    currentStrafePower = std::clamp(strafePower, minPower, maxPower);
+    currentTurnPower = std::clamp(turnPower, minPower, maxPower);
 }
 
 bool Drive::MecanumDrivePID(double angleError)
@@ -30,14 +46,15 @@ bool Drive::MecanumDrivePID(double angleError)
     double output = m_DrivePID.ClampCalculate(angleError);
     if(output > 0)
     {
-        output = output + .05;
+        output = output + .075;
     }
     else if(output < 0)
     {
-        output = output - .05;
+        output = output - .075;
     }
-
-    m_MecanumDrive->DriveCartesian(0, 0, output);
+    currentTurnPower = std::clamp(output, minPower, maxPower);
+    currentDrivePower = 0;
+    currentStrafePower = 0;
     return m_DrivePID.AtSetpoint();
 }
 
@@ -47,14 +64,15 @@ bool Drive::MecanumDrivePID(double angleError, double strafePower)
     double output = m_DrivePID.ClampCalculate(angleError);
     if(output > 0)
     {
-        output = output + .05;
+        output = output + .075;
     }
     else if(output < 0)
     {
-        output = output - .05;
+        output = output - .075;
     }
-
-    m_MecanumDrive->DriveCartesian(0, strafePower, angleError);
+    currentTurnPower = std::clamp(output, minPower, maxPower);
+    currentDrivePower = 0;
+    currentStrafePower = strafePower;
     return m_DrivePID.AtSetpoint();
 }
 
@@ -64,13 +82,19 @@ bool Drive::MecanumDrivePID(double angleError, double strafePower, double driveP
     double output = m_DrivePID.ClampCalculate(angleError);
     if(output > 0)
     {
-        output = output + .05;
+        output = output + .075;
     }
     else if(output < 0)
     {
-        output = output - .05;
+        output = output - .075;
     }
+    currentTurnPower = std::clamp(output, minPower, maxPower);
+    currentDrivePower = drivePower;
+    currentStrafePower = strafePower;
+    return m_DrivePID.AtSetpoint();
+}
 
-    m_MecanumDrive->DriveCartesian(drivePower, strafePower, output);
+bool Drive::AtSetpoint()
+{
     return m_DrivePID.AtSetpoint();
 }
