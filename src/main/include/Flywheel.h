@@ -16,7 +16,7 @@ class Flywheel
     double kP = 0.00015, kI = 0.000001, kD = 0.00005, kIz = 100, kFF = 0.000175, kMaxOutput = 1.0, kMinOutput = -1.0;
 
     double setpoint = 0;
-    double velocityTolerance = 100;
+    double velocityTolerance = 25;
   };
   PIDValues m_PIDValues;
 
@@ -36,4 +36,6 @@ class Flywheel
   /**
    * Returns true if the Velocity of the motor is within the value defined in PIDValues.velocityTolerance. */
   bool InVelocityRange();
+
+  bool KickSeen();
 };
