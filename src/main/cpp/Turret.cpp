@@ -1,10 +1,13 @@
 #include "Turret.h"
 
+#include <math.h>
+
 Turret::Turret()
 {
     // Sets the elevator encoder to the proper distane per pulse. This allows for us to get more useful distance readings.
     m_ElevatorEncoder.SetDistancePerPulse(ElevatorDistancePerPulse);
     m_IndexMotor.SetInverted(true);
+    m_IndexMotor.SetNeutralMode(ctre::phoenix::motorcontrol::NeutralMode::Brake);
 }
 
 bool Turret::SpinFlywheel(double RPM)
@@ -56,22 +59,36 @@ bool Turret::ZeroElevator()
     if(m_ElevatorLimit.Get())
     {
         m_ElevatorMotor.Set(-1);
+        return false;
     }
     else
     {
         m_ElevatorMotor.Set(0);
         m_ElevatorEncoder.Reset();
+        return true;
     }
 }
 
-// TODO: Tune function.
-double Turret::AngleToEleCounts(double angle)
+bool Turret::FlywheelKickSeen()
 {
-    return angle;
+    return m_Flywheel.KickSeen();
 }
 
-// TODO: Tune function.
+double Turret::AngleToEleCounts(double angle)
+{
+    // OLD return pow(1.125, -angle + 1.7) + 1.8;
+    // OLD return 0.01647 * pow(angle, 2) - .5202 * angle + 9.079;
+    return 0.01647 * pow(angle, 2) - .5202 * angle + 9.079;
+}
+
 double Turret::AngleToRPM(double angle)
 {
-    return angle;
+    // OLD return angle * -40.0 + 3350.0;
+    // OLD return 1.985 * pow(angle, 2) - 58.8 * angle + 2904.4;
+
+    // TODO: CHECK THIS, MAY NEED A RETUNE
+    return .9238 * pow(angle, 2) - 42 * angle + 3200;
+
+    // TODO: REVERT BACK TO THE EQUATION
+    // return 2000;
 }

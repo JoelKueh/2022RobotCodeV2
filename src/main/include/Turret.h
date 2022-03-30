@@ -4,6 +4,7 @@
 #include <frc/Encoder.h>
 #include <frc/DigitalInput.h>
 #include <ctre/phoenix/motorcontrol/can/WPI_VictorSPX.h>
+
 #include "Flywheel.h"
 #include "FrcPID.h"
 #include "WiringDiagram.h"
@@ -22,9 +23,9 @@ class Turret {
   FrcPID m_ElevatorPID {ElevatorValues};
 
   rev::CANSparkMax m_ElevatorMotor {WiringDiagram::c_Elevator, rev::CANSparkMax::MotorType::kBrushed};
-  frc::Encoder m_ElevatorEncoder {WiringDiagram::c_ElevatorLimit, WiringDiagram::c_ElevatorB};
+  frc::Encoder m_ElevatorEncoder {WiringDiagram::c_ElevatorA, WiringDiagram::c_ElevatorB};
   frc::DigitalInput m_ElevatorLimit {WiringDiagram::c_ElevatorLimit};
-  double ElevatorDistancePerPulse = -1.0/22.0;;
+  double ElevatorDistancePerPulse = -1.0/22.0;
   double ElevatorMaxDistance = 30.0;
 
  public:
@@ -61,6 +62,8 @@ class Turret {
    * Sets the Index Motor's percent power
    * @param power The percent power of the index motor */
   void SetIndex(double power);
+
+  bool FlywheelKickSeen();
 
   /**
    * Returns true if the Flywheel is in the desired range */
