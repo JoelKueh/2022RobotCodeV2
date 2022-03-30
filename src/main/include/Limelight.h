@@ -4,6 +4,8 @@
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
 class Limelight {
  public:
   /** Constructs a Limelight objec. */
@@ -17,4 +19,6 @@ class Limelight {
   double GetX();
   /** Returns the Y angle offset of the Limelight Camera. */
   double GetY();
+  /** Returns ture if there are any targets found. **/
+  bool TargetFound();
 };

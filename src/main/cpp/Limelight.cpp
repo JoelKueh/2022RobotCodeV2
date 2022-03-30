@@ -4,12 +4,24 @@ Limelight::Limelight() = default;
 
 double Limelight::GetX()
 {
-    return nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tx",0.0);
+    double tx = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tx",0.0);
+    tx = tx + 1.5;
+    frc::SmartDashboard::PutNumber("Limelight X", tx);
+    return tx;
 }
 
 double Limelight::GetY()
 {
-    return nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("ty",0.0);
+    double ty = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("ty",0.0);
+    frc::SmartDashboard::PutNumber("Limelight Y", ty);
+    return ty;
+}
+
+bool Limelight::TargetFound()
+{
+    bool tv = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tv",false);
+    frc::SmartDashboard::PutBoolean("Target Found?", tv);
+    return tv;
 }
 
 void Limelight::LEDOff()
