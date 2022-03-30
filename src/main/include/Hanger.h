@@ -5,7 +5,7 @@
 
 class Hanger {
  private:
-  frc::DoubleSolenoid HangerPiston {frc::PneumaticsModuleType::CTREPCM, WiringDiagram::c_HangerPistonA, WiringDiagram::c_HangarPistonB};
+  frc::DoubleSolenoid HangerPiston {frc::PneumaticsModuleType::CTREPCM, WiringDiagram::c_HangerPistonA, WiringDiagram::c_HangerPistonB};
  public:
   /**
    * Constructs a Hanger object. */
