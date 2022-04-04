@@ -26,5 +26,6 @@ class WiringDiagram {
   static const int c_HangerPistonA = 6; // CAN
   static const int c_HangerPistonB = 7; // CAN
 
+  static const int c_AutoSwitch = 3; // DIO
   static const int c_Xbox = 0; // Xbox
 };
