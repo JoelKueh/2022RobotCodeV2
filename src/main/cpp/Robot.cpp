@@ -1,26 +1,43 @@
 #include "Robot.h"
 
 #include <fmt/core.h>
+#include <cmath>
 
+#include <wpi/PortForwarder.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/Timer.h>
 
-frc::Timer m_Timer;
-
 void Robot::RobotInit()
 {
-  m_Timer.Start();
-
+  m_Timer = new frc::Timer();
   m_Xbox = new frc::XboxController(WiringDiagram::c_Xbox);
+  m_Gyro = new frc::ADXRS450_Gyro(frc::SPI::Port::kOnboardCS0);
+  m_AutoSwitch = new frc::DigitalInput(WiringDiagram::c_AutoSwitch);
   m_Turret = new Turret();
   m_Intake = new Intake();
   m_Hanger = new Hanger();
   m_Drive = new Drive();
   m_Limelight = new Limelight();
 
+  m_Timer->Start();
+  m_Gyro->Calibrate();
+  m_Limelight->LEDOn();
+
+  // Port Forwarding the Limelight to work over USB.
+  wpi::PortForwarder::GetInstance().Add(5800, "limelight.local", 5800);
+  wpi::PortForwarder::GetInstance().Add(5801, "limelight.local", 5801);
+  wpi::PortForwarder::GetInstance().Add(5802, "limelight.local", 5802);
+  wpi::PortForwarder::GetInstance().Add(5803, "limelight.local", 5803);
+  wpi::PortForwarder::GetInstance().Add(5804, "limelight.local", 5804);
+  wpi::PortForwarder::GetInstance().Add(5805, "limelight.local", 5805);
+
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
+  m_chooser.AddOption("Basic Auto", "Basic Auto");
+  m_chooser.AddOption("Three Ball Auto", "Three Ball Auto");
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+
+  frc::SmartDashboard::PutNumber("Testing Elevator Setpoint", 0);
+  frc::SmartDashboard::PutNumber("Testing RPM", 0);
 }
 
 /**
@@ -47,54 +64,84 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit()
 {
   resetDone = false;
-  m_Timer.Reset();
+  m_Gyro->Reset();
+  m_Timer->Reset();
+  m_Hanger->In();
+  m_Intake->Out();
 
-  m_autoSelected = m_chooser.GetSelected();
+  m_AutoSwitchState = !m_AutoSwitch->Get();
+  autoState = 0;
+  // m_autoSelected = m_chooser.GetSelected();
   // m_autoSelected = SmartDashboard::GetString("Auto Selector",
   //     kAutoNameDefault);
-  fmt::print("Auto selected: {}\n", m_autoSelected);
+  // fmt::print("Auto selected: {}\n", m_autoSelected);
 
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
+  // if (m_autoSelected == "Basic Auto")
+  // {
+
+  // }
+  // else if(m_autoSelected == "Three Ball Auto")
+  // {
+
+  // }
+  // else
+  // {
+  //   // Default Auto goes here
+  // }
 }
 
 void Robot::AutonomousPeriodic()
 {
+  m_Drive->UpdateMecanumDrive();
+
   if (!resetDone)
   {
-    if(m_Intake->Init(0_s, m_Timer.Get()) && m_Turret->ZeroElevator()) { resetDone = true; }
+    if(m_Intake->Init(0_s, m_Timer->Get()) && m_Turret->ZeroElevator()) { resetDone = true; m_Timer->Reset(); }
   }
   else
   {
-    if (m_autoSelected == kAutoNameCustom)
+    // if (m_autoSelected == "Basic Auto")
+    // {
+    //   // BasicAuto();
+    // }
+    // else if(m_autoSelected == "Three Ball Auto")
+    // {
+    //   // ThreeBallAuto();
+    // }
+    // else
+    // {
+    //   // Default Auto goes here
+    // }
+
+    if(m_AutoSwitchState)
     {
-      // Custom Auto goes here
+      ThreeBallAuto();
     }
     else
     {
-      // Default Auto goes here
+      TwoBallAuto();
     }
   }
 }
 
 void Robot::TeleopInit()
 {
+  StopTargeting();
   resetDone = false;
-  m_Timer.Reset();
+  m_Timer->Reset();
+  m_Hanger->In();
+  m_Intake->Out();
 }
 
 void Robot::TeleopPeriodic()
 {
-  // TODO: POSSIBLY REMOVE BEFORE COMPETITION, ONLY NEEDS TO BE RESET ONCE.
   if(!resetDone)
   {
-    if(m_Intake->Init(0_s, m_Timer.Get()) && m_Turret->ZeroElevator()) { resetDone = true; }
+    if(m_Intake->Init(0_s, m_Timer->Get()) && m_Turret->ZeroElevator()) { resetDone = true; }
   }
   else
   {
+    m_Drive->UpdateMecanumDrive();
     if(m_Xbox->GetRightBumperPressed())
     {
       intakeOut = !intakeOut;
@@ -104,26 +151,28 @@ void Robot::TeleopPeriodic()
 
     if(m_Xbox->GetLeftBumperPressed())
     {
-      intakeOut = !intakeOut;
-      m_Intake->Toggle();
+      hangerOut = !hangerOut;
+      m_Hanger->Toggle();
     }
     frc::SmartDashboard::PutBoolean("Hanger Out?", hangerOut);
 
-    if(m_Xbox->GetPOV() == 90 && m_Xbox->GetAButton())
+    if(m_Xbox->GetPOV() == 90 && m_Xbox->GetBButtonPressed())
     {
       aimOverridden = true;
     }
-    else if(m_Xbox->GetPOV() == 180 && m_Xbox->GetBButton())
+    else if(m_Xbox->GetPOV() == 180 && m_Xbox->GetAButtonPressed())
     {
       aimOverridden = false;
     }
-    frc::SmartDashboard::PutBoolean("Aim Overridden", intakeOut);
+    frc::SmartDashboard::PutBoolean("Aim Overridden", aimOverridden);
 
-    if(!targeting)
+    if(m_Xbox->GetYButtonPressed())
     {
-      m_Drive->MecanumDrive(m_Xbox->GetLeftY(), -m_Xbox->GetLeftX(), -m_Xbox->GetRightX());
+      targeting = !targeting;
     }
-    else
+    frc::SmartDashboard::PutBoolean("Targeting?", targeting);
+
+    if(targeting && m_Limelight->TargetFound())
     {
       if(!aimOverridden)
       {
@@ -133,6 +182,29 @@ void Robot::TeleopPeriodic()
       {
         AimOverriddenControl();
       }
+    }
+    else
+    {
+      StopTargeting();
+
+      m_Drive->MecanumDrive(m_Xbox->GetLeftY(), -m_Xbox->GetLeftX(), -m_Xbox->GetRightX());
+
+      if(m_Xbox->GetRightTriggerAxis() > .15)
+      {
+        m_Intake->SpinForward();
+        m_Turret->SetIndex(-.15);
+      }
+      else if(m_Xbox->GetLeftTriggerAxis() > .15)
+      {
+        m_Intake->SpinReverse();
+      }
+      else
+      {
+        m_Intake->Stop();
+        m_Turret->SetIndex(0);
+      }
+
+      frc::SmartDashboard::PutBoolean("Locked On", lockedOn);
     }
   }
 }
@@ -161,42 +233,17 @@ void Robot::AimOverriddenControl()
     overriddenElevator = 30;
   }
 
-  if(m_Turret->RunElevator(overriddenElevator) &&
-     m_Turret->SpinFlywheel(overriddenRPM))
-  {
-    lockedOn = true;
-  }
+  bool inElevatorRange = m_Turret->RunElevator(overriddenElevator);
+  bool inFlywheelRange = m_Turret->SpinFlywheel(overriddenRPM);
 
-  // Repeatedly set the last Shot time to the current time so that when we finally lock on, we approximately now when we started shooting.
-  if(!lockedOn)
-  {
-    lastShotTime = m_Timer.Get();
-  }
-  else
+  if((inElevatorRange && inFlywheelRange) || m_Xbox->GetXButtonPressed())
   {
     m_Turret->SetIndex(1);
     m_Intake->SpinForward();
-
-    // If the elapsed time since the shot is greater than two seconds, stop the motor and stop targeting.
-    if(m_Timer.Get() - lastShotTime > 2_s)
-    {
-      m_Turret->SetIndex(0);
-      m_Intake->Stop();
-      lockedOn = false;
-      targeting = false;
-    }
-  }
-
-  if(m_Xbox->GetYButtonPressed())
-  {
-    m_Turret->SetIndex(0);
-    m_Intake->Stop();
-    lockedOn = false;
-    targeting = false;
   }
 }
 
-void Robot::AimedControl()
+bool Robot::AimedControl()
 {
   frc::SmartDashboard::PutBoolean("Locked On", lockedOn);
 
@@ -207,41 +254,284 @@ void Robot::AimedControl()
   double elevatorSetpoint = m_Turret->AngleToEleCounts(m_Limelight->GetY());
   double flywheelRPM = m_Turret->AngleToRPM(m_Limelight->GetY());
 
-  // Set the turret and drive to target the desired values. Passes if all of the pieces are in range.
-  if(m_Drive->MecanumDrivePID(xOffset, strafePower, drivePower) &&
-      m_Turret->RunElevator(elevatorSetpoint) && 
-      m_Turret->SpinFlywheel(flywheelRPM))
-  {
-    lockedOn = true;
-  }
+  bool inAngleRange = m_Drive->MecanumDrivePID(xOffset, strafePower, drivePower);
+  bool inEleRange = m_Turret->RunElevator(elevatorSetpoint);
+  bool inFlywheelRange = m_Turret->SpinFlywheel(flywheelRPM);
 
-  // Repeatedly set the last Shot time to the current time so that when we finally lock on, we approximately now when we started shooting.
-  if(!lockedOn)
+  switch (aimingState)
   {
-    lastShotTime = m_Timer.Get();
-  }
-  else
-  {
-    m_Turret->SetIndex(1);
-    m_Intake->SpinForward();
-
-    // If the elapsed time since the shot is greater than two seconds, stop the motor and stop targeting.
-    if(m_Timer.Get() - lastShotTime > 2_s)
+    case 0:
     {
-      m_Turret->SetIndex(0);
-      m_Intake->Stop();
-      lockedOn = false;
-      targeting = false;
-    }
-  }
+      if((inAngleRange && inEleRange && inFlywheelRange &&
+        strafePower < .1 && strafePower > -.1 && drivePower < .1 && strafePower > -.1) ||
+        m_Xbox->GetXButtonPressed())
+      {
+        lockedOn = true;
+        aimingState++;
 
-  if(m_Xbox->GetYButtonPressed())
-  {
-    m_Turret->SetIndex(0);
-    m_Intake->Stop();
-    lockedOn = false;
-    targeting = false;
+        m_Turret->SetIndex(1);
+        m_Intake->SpinForward();
+        
+        lastShotTime = m_Timer->Get();
+      }
+      break;
+    }
+    case 1:
+    {
+      if(m_Turret->FlywheelKickSeen())
+      {
+        lastKickTime = m_Timer->Get();
+        m_Turret->SetIndex(0);
+        aimingState++;
+      }
+      break;
+    }
+    case 2:
+    {
+      if(m_Timer->Get() - lastKickTime > .65_s)
+      {
+        m_Turret->SetIndex(1);
+
+        aimingState++;
+      }
+      break;
+    }
+    case 3:
+    {
+      if(m_Timer->Get() - lastKickTime > .8_s)
+      {
+        StopTargeting();
+        return true;
+      }
+      break;
+    }
+    default: break;
   }
+  frc::SmartDashboard::PutNumber("Aiming State", aimingState);
+
+  frc::SmartDashboard::PutBoolean("In Flywheel Range", inFlywheelRange);
+  frc::SmartDashboard::PutBoolean("In Drive Range", inAngleRange);
+  frc::SmartDashboard::PutBoolean("In Elevator Range", inEleRange);
+  
+  return false;
+}
+
+void Robot::ThreeBallAuto()
+{
+  switch (autoState)
+  {
+    case 0:
+    {
+      // DRIVING NEGATIVE IS DRIVING FORWARDS
+      m_Drive->MecanumDrive(-.5, 0, 0);
+      m_Intake->SpinForward();
+      m_Turret->SetIndex(-.15);
+
+      m_Turret->SpinFlywheel(2750);
+      m_Turret->RunElevator(5);
+
+      if(m_Timer->Get() > .8_s) { autoState++; m_Drive->MecanumDrive(0, 0, 0); }
+      break;
+    }
+    case 1:
+    {
+      m_Turret->SpinFlywheel(2750);
+      m_Turret->RunElevator(5);
+
+      if(m_Timer->Get() > 1.4_s) { autoState++; }
+      break;
+    }
+    case 2:
+    {
+      m_Drive->MecanumDrive(1, 0, 0);
+
+      m_Turret->SpinFlywheel(2750);
+      m_Turret->RunElevator(5);
+
+      if(m_Timer->Get() > 1.925_s) { autoState++; m_Drive->MecanumDrive(0, 0, 0); }
+      break;
+    }
+    case 3:
+    {
+      double gyro = std::fmod(m_Gyro->GetAngle(), 360);
+      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      m_Drive->MecanumDrivePID(205 - gyro);
+
+      bool inFlywheelRange = m_Turret->SpinFlywheel(2750);
+      bool inDriveRange = m_Turret->RunElevator(5);
+
+      if(m_Drive->AtSetpoint() && inFlywheelRange && inDriveRange)
+      {
+        lockedOn = true;
+      }
+
+      if(lockedOn)
+      {
+        if(ShootUnaimed())
+        {
+          autoState++;
+        }
+      }
+      break;
+    }
+    case 4:
+    {
+      double gyro = std::fmod(m_Gyro->GetAngle(), 360);
+      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      m_Drive->MecanumDrivePID(90 - gyro);
+
+      if(m_Drive->AtSetpoint()) { autoState++; autoSecondTurnTime = m_Timer->Get(); }
+      break;
+    }
+    case 5:
+    {
+      m_Drive->MecanumDrive(-1, 0, 0);
+
+      m_Turret->SpinFlywheel(3400);
+      m_Turret->RunElevator(18);
+
+      if(m_Timer->Get() > autoSecondTurnTime + 1.2_s) { autoState++; m_Drive->MecanumDrive(0, 0, 0); }
+      break;
+    }
+    case 6:
+    {
+      m_Turret->SpinFlywheel(3400);
+      m_Turret->RunElevator(18);
+
+      if(m_Timer->Get() > autoSecondTurnTime + 1.8_s) { autoState++; lockedOn = false; }
+      break;
+    }
+    case 7:
+    {
+      double gyro = std::fmod(m_Gyro->GetAngle(), 360);
+      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      m_Drive->MecanumDrivePID(245 - gyro);
+
+      bool inFlywheelRange = m_Turret->SpinFlywheel(3400);
+      bool inDriveRange = m_Turret->RunElevator(14);
+
+      if(m_Drive->AtSetpoint() && inFlywheelRange && inDriveRange)
+      {
+        lockedOn = true;
+      }
+
+      if(lockedOn)
+      {
+        if(ShootUnaimed())
+        {
+          aimingState++;
+        }
+      }
+      break;
+    }
+    default: break;
+  }
+  frc::SmartDashboard::PutNumber("Auto State", autoState);
+}
+
+void Robot::TwoBallAuto()
+{
+  switch (autoState)
+  {
+    case 0:
+    {
+      // DRIVING NEGATIVE IS DRIVING FORWARDS
+      m_Drive->MecanumDrive(-.5, 0, 0);
+      m_Intake->SpinForward();
+      m_Turret->SetIndex(-.15);
+
+      m_Turret->SpinFlywheel(2750);
+      m_Turret->RunElevator(5);
+
+      if(m_Timer->Get() > 1.4_s) { autoState++; m_Drive->MecanumDrive(0, 0, 0); }
+      break;
+    }
+    case 1:
+    {
+      m_Turret->SpinFlywheel(2750);
+      m_Turret->RunElevator(5);
+
+      if(m_Timer->Get() > 1.5_s) { autoState++; }
+      break;
+    }
+    case 2:
+    {
+      double gyro = std::fmod(m_Gyro->GetAngle(), 360);
+      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      m_Drive->MecanumDrivePID(180 - gyro);
+
+      if(m_Drive->AtSetpoint()) { autoState++; }
+      break;
+    }
+    case 3:
+    {
+      if(AimedControl())
+      {
+        autoState++;
+      }
+      break;
+    }
+    frc::SmartDashboard::PutNumber("Auto State", autoState);
+  }
+}
+
+void Robot::StopTargeting()
+{
+  m_Turret->SetIndex(0);
+  m_Turret->StopElevator();
+  m_Turret->StopFlywheel();
+  aimingState = 0;
+  targeting = false;
+  lockedOn = false;
+}
+
+bool Robot::ShootUnaimed()
+{
+  switch (aimingState)
+  {
+    case 0:
+    {
+      lockedOn = true;
+      aimingState++;
+
+      m_Turret->SetIndex(1);
+      m_Intake->SpinForward();
+        
+      lastShotTime = m_Timer->Get();
+      break;
+    }
+    case 1:
+    {
+      if(m_Turret->FlywheelKickSeen())
+      {
+        lastKickTime = m_Timer->Get();
+        m_Turret->SetIndex(0);
+        aimingState++;
+      }
+      break;
+    }
+    case 2:
+    {
+      if(m_Timer->Get() > lastKickTime + .65_s)
+      {
+        m_Turret->SetIndex(1);
+
+        aimingState++;
+      }
+      break;
+    }
+    case 3:
+    {
+      if(m_Timer->Get() > lastKickTime + .8_s)
+      {
+        StopTargeting();
+        return true;
+      }
+      break;
+    }
+    default: break;
+  }
+  return false;
 }
 
 #ifndef RUNNING_FRC_TESTS

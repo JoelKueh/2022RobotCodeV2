@@ -5,6 +5,9 @@
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc/XboxController.h>
+#include <frc/Timer.h>
+#include <frc/DigitalInput.h>
+#include <frc/ADXRS450_Gyro.h>
 
 #include "Drive.h"
 #include "Turret.h"
@@ -31,10 +34,14 @@ class Robot : public frc::TimedRobot {
  private:
   frc::SendableChooser<std::string> m_chooser;
   const std::string kAutoNameDefault = "Default";
-  const std::string kAutoNameCustom = "My Auto";
   std::string m_autoSelected;
 
   units::time::second_t lastShotTime;
+  units::time::second_t lastKickTime;
+
+  units::time::second_t autoFirstShotTime;
+  units::time::second_t autoSecondTurnTime;
+  bool firstShotDone = false;
 
   double overriddenRPM = 2500;
   double overriddenElevator = 10;
@@ -48,13 +55,25 @@ class Robot : public frc::TimedRobot {
   bool targeting = false;
   bool lockedOn = false;
 
+  int autoState = 0;
+  int aimingState = 0;
+
   frc::XboxController* m_Xbox;
+  frc::Timer* m_Timer;
+  frc::ADXRS450_Gyro* m_Gyro;
+  frc::DigitalInput* m_AutoSwitch;
+  bool m_AutoSwitchState = false;
   Drive* m_Drive;
   Turret* m_Turret;
   Hanger* m_Hanger;
   Intake* m_Intake;
   Limelight* m_Limelight;
 
+  void BasicAuto();
+  void TwoBallAuto();
+  void ThreeBallAuto();
   void AimOverriddenControl();
-  void AimedControl();
+  bool AimedControl();
+  bool ShootUnaimed();
+  void StopTargeting();
 };
