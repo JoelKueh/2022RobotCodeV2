@@ -43,5 +43,5 @@ bool Flywheel::InVelocityRange()
 
 bool Flywheel::KickSeen()
 {
-    return m_Encoder.GetVelocity() < m_PIDValues.setpoint - 100;
+    return m_Encoder.GetVelocity() < m_PIDValues.setpoint - 300;
 }

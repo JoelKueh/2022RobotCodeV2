@@ -13,7 +13,7 @@ class Flywheel
 
   struct PIDValues
   {
-    double kP = 0.00015, kI = 0.000001, kD = 0.00005, kIz = 100, kFF = 0.000175, kMaxOutput = 1.0, kMinOutput = -1.0;
+    double kP = 0.00015, kI = 0.000001, kD = 0.00005, kIz = 300, kFF = 0.0001765, kMaxOutput = 1.0, kMinOutput = -1.0;
 
     double setpoint = 0;
     double velocityTolerance = 25;
