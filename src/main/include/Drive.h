@@ -11,9 +11,9 @@ class Drive {
   // Creates the struct that we defined in our FrcPID class and sets it's values
   FrcPID::PIDValues m_DrivePIDValues
   {
-    m_DrivePIDValues.kP = .03, m_DrivePIDValues.kI = 0, m_DrivePIDValues.kD = 0, m_DrivePIDValues.kMaxOutput = .35, m_DrivePIDValues.kMinOutput = -.35,
+    m_DrivePIDValues.kP = .03, m_DrivePIDValues.kI = 0, m_DrivePIDValues.kD = 0, m_DrivePIDValues.kMaxOutput = .5, m_DrivePIDValues.kMinOutput = -.5,
     m_DrivePIDValues.setpoint = 0,
-    m_DrivePIDValues.positionTolerance = 2, m_DrivePIDValues.velocityTolerance = 5,
+    m_DrivePIDValues.positionTolerance = 3, m_DrivePIDValues.velocityTolerance = 5,
   };
   // Constructs an object of the FrcPID class that we made. Uses the values from the struct that we made above as an input.
   FrcPID m_DrivePID {m_DrivePIDValues};
@@ -24,10 +24,6 @@ class Drive {
   ctre::phoenix::motorcontrol::can::WPI_TalonSRX m_frontRight {WiringDiagram::c_FrontRightMotor};
   ctre::phoenix::motorcontrol::can::WPI_TalonSRX m_backLeft {WiringDiagram::c_BackLeftMotor};
   ctre::phoenix::motorcontrol::can::WPI_TalonSRX m_backRight {WiringDiagram::c_BackRightMotor};
-
-  // TODO: LOOK AT REMOVING THESE
-  double minPower = -1;
-  double maxPower = 1;
 
   double currentDrivePower = 0;
   double currentStrafePower = 0;
@@ -75,11 +71,6 @@ class Drive {
   /**
    * To be called every robot cycle, runs the MecanumDrive based on the values set by MecanumDrive() */
   void UpdateMecanumDrive();
-  /**
-   * Sets the minimum and maximum power of for the drive motors. Defaults to -1 and 1.
-   * @param min The minimum percent power
-   * @param max The maximum percent power */
-  void SetMinAndMaxPower(double min = -1, double max = 1);
   /**
    * Runs the mecanum drive with a deadzone of .15
    * @param drivePower The percent power dedicated to driving.

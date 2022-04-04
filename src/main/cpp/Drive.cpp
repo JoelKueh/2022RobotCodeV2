@@ -1,7 +1,5 @@
 #include "Drive.h"
 
-// TODO: LOOK AT REMOVING THE MIN AND MAX OUTPUTS FROM THIS FILE
-
 Drive::Drive()
 {
     // Sets the three moters that we need to be inverted (not all of them do)
@@ -20,12 +18,6 @@ void Drive::UpdateMecanumDrive()
     m_MecanumDrive->DriveCartesian(currentDrivePower, currentStrafePower, currentTurnPower);
 }
 
-void Drive::SetMinAndMaxPower(double min, double max)
-{
-    minPower = min;
-    maxPower = max;
-}
-
 void Drive::MecanumDrive(double drivePower, double strafePower, double turnPower)
 {
     // Checks to see if variables are between -.15 and .15, if any of them are, they get set down to 0.
@@ -33,9 +25,9 @@ void Drive::MecanumDrive(double drivePower, double strafePower, double turnPower
     if(strafePower < .15 && strafePower > -.15) { strafePower = 0; }
     if(turnPower < .15 && turnPower > -.15) { turnPower = 0; }
 
-    currentDrivePower = std::clamp(drivePower, minPower, maxPower);
-    currentStrafePower = std::clamp(strafePower, minPower, maxPower);
-    currentTurnPower = std::clamp(turnPower, minPower, maxPower);
+    currentDrivePower = drivePower;
+    currentStrafePower = strafePower;
+    currentTurnPower = turnPower;
 }
 
 bool Drive::MecanumDrivePID(double angleError)
@@ -46,13 +38,13 @@ bool Drive::MecanumDrivePID(double angleError)
     double output = m_DrivePID.ClampCalculate(angleError);
     if(output > 0)
     {
-        output = output + .075;
+        output = output + .05;
     }
     else if(output < 0)
     {
-        output = output - .075;
+        output = output - .05;
     }
-    currentTurnPower = std::clamp(output, minPower, maxPower);
+    currentTurnPower = output;
     currentDrivePower = 0;
     currentStrafePower = 0;
     return m_DrivePID.AtSetpoint();
@@ -64,13 +56,13 @@ bool Drive::MecanumDrivePID(double angleError, double strafePower)
     double output = m_DrivePID.ClampCalculate(angleError);
     if(output > 0)
     {
-        output = output + .075;
+        output = output + .05;
     }
     else if(output < 0)
     {
-        output = output - .075;
+        output = output - .05;
     }
-    currentTurnPower = std::clamp(output, minPower, maxPower);
+    currentTurnPower = output;
     currentDrivePower = 0;
     currentStrafePower = strafePower;
     return m_DrivePID.AtSetpoint();
@@ -88,7 +80,7 @@ bool Drive::MecanumDrivePID(double angleError, double strafePower, double driveP
     {
         output = output - .075;
     }
-    currentTurnPower = std::clamp(output, minPower, maxPower);
+    currentTurnPower = output;
     currentDrivePower = drivePower;
     currentStrafePower = strafePower;
     return m_DrivePID.AtSetpoint();
