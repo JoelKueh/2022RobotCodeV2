@@ -5,7 +5,7 @@ Limelight::Limelight() = default;
 double Limelight::GetX()
 {
     double tx = nt::NetworkTableInstance::GetDefault().GetTable("limelight")->GetNumber("tx",0.0);
-    tx = tx + 1.5;
+    tx = tx + 1;
     frc::SmartDashboard::PutNumber("Limelight X", tx);
     return tx;
 }
