@@ -78,6 +78,8 @@ double Turret::AngleToEleCounts(double angle)
 {
     // OLD return pow(1.125, -angle + 1.7) + 1.8;
     // OLD return 0.01647 * pow(angle, 2) - .5202 * angle + 9.079;
+    
+    // FINAL
     return 0.01647 * pow(angle, 2) - .5202 * angle + 9.079;
 }
 
@@ -87,8 +89,20 @@ double Turret::AngleToRPM(double angle)
     // OLD return 1.985 * pow(angle, 2) - 58.8 * angle + 2904.4;
 
     // TODO: CHECK THIS, MAY NEED A RETUNE
-    return .9238 * pow(angle, 2) - 42 * angle + 3200;
+    // return .9238 * pow(angle, 2) - 42 * angle + 3175;
 
     // TODO: REVERT BACK TO THE EQUATION
     // return 2000;
+
+    // FINAL?
+    // return 2.56 * pow(angle - 2, 2) - 65.405 * (angle - 2) + 3082.8;
+
+    if(angle < -9)
+    {
+        return -160 * (angle + 9) + 3627.828;
+    }
+    else
+    {
+        return .9238 * pow(angle, 2) - 42 * angle + 3175;
+    }
 }
