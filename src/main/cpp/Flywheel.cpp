@@ -27,10 +27,6 @@ void Flywheel::StopMotor()
 
 bool Flywheel::InVelocityRange()
 {
-    // TODO: REMOVE TEMP SMARTDASHBOARD STUFF
-    frc::SmartDashboard::PutNumber("RPM", m_Encoder.GetVelocity());
-    frc::SmartDashboard::PutNumber("Flywheel Setpoint", m_PIDValues.setpoint);
-
     if(m_Encoder.GetVelocity() < m_PIDValues.setpoint + m_PIDValues.velocityTolerance && m_Encoder.GetVelocity() > m_PIDValues.setpoint - m_PIDValues.velocityTolerance)
     {
         return true;
@@ -43,5 +39,5 @@ bool Flywheel::InVelocityRange()
 
 bool Flywheel::KickSeen()
 {
-    return m_Encoder.GetVelocity() < m_PIDValues.setpoint - 300;
+    return m_Encoder.GetVelocity() < m_PIDValues.setpoint - 200;
 }

@@ -24,20 +24,16 @@ void Robot::RobotInit()
   m_Limelight->LEDOn();
 
   // Port Forwarding the Limelight to work over USB.
-  wpi::PortForwarder::GetInstance().Add(5800, "limelight.local", 5800);
-  wpi::PortForwarder::GetInstance().Add(5801, "limelight.local", 5801);
-  wpi::PortForwarder::GetInstance().Add(5802, "limelight.local", 5802);
-  wpi::PortForwarder::GetInstance().Add(5803, "limelight.local", 5803);
-  wpi::PortForwarder::GetInstance().Add(5804, "limelight.local", 5804);
-  wpi::PortForwarder::GetInstance().Add(5805, "limelight.local", 5805);
+  wpi::PortForwarder::GetInstance().Add(5800, "10.21.43.11", 5800);
+  wpi::PortForwarder::GetInstance().Add(5801, "10.21.43.11", 5801);
+  wpi::PortForwarder::GetInstance().Add(5802, "10.21.43.11", 5802);
+  wpi::PortForwarder::GetInstance().Add(5803, "10.21.43.11", 5803);
+  wpi::PortForwarder::GetInstance().Add(5804, "10.21.43.11", 5804);
+  wpi::PortForwarder::GetInstance().Add(5805, "10.21.43.11", 5805);
 
-  m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  m_chooser.AddOption("Basic Auto", "Basic Auto");
-  m_chooser.AddOption("Three Ball Auto", "Three Ball Auto");
-  frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
-
-  frc::SmartDashboard::PutNumber("Testing Elevator Setpoint", 0);
-  frc::SmartDashboard::PutNumber("Testing RPM", 0);
+  // TESTING SHOT STUFF
+  // frc::SmartDashboard::PutNumber("Testing Elevator Setpoint", 0);
+  // frc::SmartDashboard::PutNumber("Testing RPM", 0);
 }
 
 /**
@@ -71,23 +67,6 @@ void Robot::AutonomousInit()
 
   m_AutoSwitchState = !m_AutoSwitch->Get();
   autoState = 0;
-  // m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
-  // fmt::print("Auto selected: {}\n", m_autoSelected);
-
-  // if (m_autoSelected == "Basic Auto")
-  // {
-
-  // }
-  // else if(m_autoSelected == "Three Ball Auto")
-  // {
-
-  // }
-  // else
-  // {
-  //   // Default Auto goes here
-  // }
 }
 
 void Robot::AutonomousPeriodic()
@@ -100,19 +79,6 @@ void Robot::AutonomousPeriodic()
   }
   else
   {
-    // if (m_autoSelected == "Basic Auto")
-    // {
-    //   // BasicAuto();
-    // }
-    // else if(m_autoSelected == "Three Ball Auto")
-    // {
-    //   // ThreeBallAuto();
-    // }
-    // else
-    // {
-    //   // Default Auto goes here
-    // }
-
     if(m_AutoSwitchState)
     {
       ThreeBallAuto();
@@ -142,19 +108,19 @@ void Robot::TeleopPeriodic()
   else
   {
     m_Drive->UpdateMecanumDrive();
-    if(m_Xbox->GetRightBumperPressed())
-    {
-      intakeOut = !intakeOut;
-      m_Intake->Toggle();
-    }
-    frc::SmartDashboard::PutBoolean("Intake Out?", intakeOut);
 
-    if(m_Xbox->GetLeftBumperPressed())
+    double xboxRB = m_Xbox->GetRightBumperPressed();
+    if(m_Xbox->GetLeftBumper() && xboxRB)
     {
       hangerOut = !hangerOut;
       m_Hanger->Toggle();
     }
-    frc::SmartDashboard::PutBoolean("Hanger Out?", hangerOut);
+
+    if(m_Xbox->GetPOV() == 0 && xboxRB)
+    {
+      intakeOut = !intakeOut;
+      m_Intake->Toggle();
+    }
 
     if(m_Xbox->GetPOV() == 90 && m_Xbox->GetBButtonPressed())
     {
@@ -307,8 +273,8 @@ bool Robot::AimedControl()
     }
     default: break;
   }
-  frc::SmartDashboard::PutNumber("Aiming State", aimingState);
 
+  // REMOVE?
   frc::SmartDashboard::PutBoolean("In Flywheel Range", inFlywheelRange);
   frc::SmartDashboard::PutBoolean("In Drive Range", inAngleRange);
   frc::SmartDashboard::PutBoolean("In Elevator Range", inEleRange);
@@ -354,7 +320,7 @@ void Robot::ThreeBallAuto()
     case 3:
     {
       double gyro = std::fmod(m_Gyro->GetAngle(), 360);
-      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      // frc::SmartDashboard::PutNumber("Gyro", gyro);
       m_Drive->MecanumDrivePID(205 - gyro);
 
       bool inFlywheelRange = m_Turret->SpinFlywheel(2750);
@@ -377,7 +343,7 @@ void Robot::ThreeBallAuto()
     case 4:
     {
       double gyro = std::fmod(m_Gyro->GetAngle(), 360);
-      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      // frc::SmartDashboard::PutNumber("Gyro", gyro);
       m_Drive->MecanumDrivePID(90 - gyro);
 
       if(m_Drive->AtSetpoint()) { autoState++; autoSecondTurnTime = m_Timer->Get(); }
@@ -404,7 +370,7 @@ void Robot::ThreeBallAuto()
     case 7:
     {
       double gyro = std::fmod(m_Gyro->GetAngle(), 360);
-      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      // frc::SmartDashboard::PutNumber("Gyro", gyro);
       m_Drive->MecanumDrivePID(245 - gyro);
 
       bool inFlywheelRange = m_Turret->SpinFlywheel(3400);
@@ -426,7 +392,6 @@ void Robot::ThreeBallAuto()
     }
     default: break;
   }
-  frc::SmartDashboard::PutNumber("Auto State", autoState);
 }
 
 void Robot::TwoBallAuto()
@@ -457,7 +422,7 @@ void Robot::TwoBallAuto()
     case 2:
     {
       double gyro = std::fmod(m_Gyro->GetAngle(), 360);
-      frc::SmartDashboard::PutNumber("Gyro", gyro);
+      // frc::SmartDashboard::PutNumber("Gyro", gyro);
       m_Drive->MecanumDrivePID(180 - gyro);
 
       if(m_Drive->AtSetpoint()) { autoState++; }
@@ -471,7 +436,6 @@ void Robot::TwoBallAuto()
       }
       break;
     }
-    frc::SmartDashboard::PutNumber("Auto State", autoState);
   }
 }
 
@@ -502,9 +466,8 @@ bool Robot::ShootUnaimed()
     }
     case 1:
     {
-      if(m_Turret->FlywheelKickSeen())
+      if(m_Timer->Get() > lastShotTime + .15_s)
       {
-        lastKickTime = m_Timer->Get();
         m_Turret->SetIndex(0);
         aimingState++;
       }
@@ -512,7 +475,7 @@ bool Robot::ShootUnaimed()
     }
     case 2:
     {
-      if(m_Timer->Get() > lastKickTime + .65_s)
+      if(m_Timer->Get() > lastKickTime + .8_s)
       {
         m_Turret->SetIndex(1);
 
@@ -522,7 +485,7 @@ bool Robot::ShootUnaimed()
     }
     case 3:
     {
-      if(m_Timer->Get() > lastKickTime + .8_s)
+      if(m_Timer->Get() > lastKickTime + .95_s)
       {
         StopTargeting();
         return true;

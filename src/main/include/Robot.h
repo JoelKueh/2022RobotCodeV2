@@ -3,7 +3,6 @@
 #include <string>
 
 #include <frc/TimedRobot.h>
-#include <frc/smartdashboard/SendableChooser.h>
 #include <frc/XboxController.h>
 #include <frc/Timer.h>
 #include <frc/DigitalInput.h>
@@ -32,10 +31,6 @@ class Robot : public frc::TimedRobot {
   void SimulationPeriodic() override;
 
  private:
-  frc::SendableChooser<std::string> m_chooser;
-  const std::string kAutoNameDefault = "Default";
-  std::string m_autoSelected;
-
   units::time::second_t lastShotTime;
   units::time::second_t lastKickTime;
 
@@ -52,6 +47,7 @@ class Robot : public frc::TimedRobot {
   bool intakeOut = true;
   bool hangerOut = false;
 
+  bool shootingMid = false;
   bool targeting = false;
   bool lockedOn = false;
 
