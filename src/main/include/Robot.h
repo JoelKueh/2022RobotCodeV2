@@ -47,7 +47,6 @@ class Robot : public frc::TimedRobot {
   bool intakeOut = true;
   bool hangerOut = false;
 
-  bool shootingMid = false;
   bool targeting = false;
   bool lockedOn = false;
 
