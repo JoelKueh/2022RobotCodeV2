@@ -18,6 +18,9 @@
  * 
  * With that said, enjoy reading through my code
  * 
+ * After you have read through Robot.cpp and Robot.h I reccomend that you read Intake.h, then Intake.cpp
+ * Maybe after that, you can read through some of Drive.h
+ * 
 ******************************************************************************************/
 
 
