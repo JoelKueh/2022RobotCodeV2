@@ -4,6 +4,12 @@
 #include <ctre/phoenix/motorcontrol/can/WPI_VictorSPX.h>
 #include "WiringDiagram.h"
 
+/****************************************************************************************
+ * This class is one of the most simple classes that I wrote. If you are looking for a place to start
+ * understanding the structure of a class itself. Look in this file, the definition of the funciton is Intake.cpp
+ * and the use of the class in Robot.cpp.
+*/
+
 class Intake {
  private:
   frc::DoubleSolenoid IntakePiston {frc::PneumaticsModuleType::CTREPCM, WiringDiagram::c_IntakePistonA, WiringDiagram::c_IntakePistonB};

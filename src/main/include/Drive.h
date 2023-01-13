@@ -5,6 +5,21 @@
 #include "FrcPID.h"
 #include "WiringDiagram.h"
 
+/************************************************************************************************
+ * 
+ * If there's one thing that I regret about my code, it's the way I implemented the drive class.
+ * The problem with it is in the functions UpdateMecanumDrive() and the MecanumDrive().
+ * UpdateMecanumDrive is run once every robot cycle in Robot.cpp (line 141).
+ * It sets the robot to run at the speeds that I have set in lines 35-37.
+ * This bypasses a safety measure that MecanumDrive() uses. If I were to get stuck
+ * in a loop where I was no longer updating the drive, strafe, and turn power,
+ * the robot would continue to go in the same direction that it started in.
+ * DON'T DO THIS. Go straight from the Xbox controller inputs to the MecanumDrive call.
+ * You can still make a class, But don't implement it the way I did.
+ * My best advice is to either ask me how to implement it better, or read the documentation.
+ * 
+*************************************************************************************************/
+
 class Drive {
  private:
   

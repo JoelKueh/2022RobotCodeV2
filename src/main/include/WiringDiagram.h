@@ -1,9 +1,8 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 #pragma once
 
+// This is a nice little class which allows us to keep all o four motor port numbers in the same spot.
+// It's just a little quality of life class which makes everything easier to read.
 class WiringDiagram {
  public:
   static const int c_Flywheel = 1; // CAN
